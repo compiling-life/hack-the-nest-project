@@ -11,53 +11,8 @@ const scoreBar = document.getElementById('score-bar');
 const redFlagsList = document.getElementById('red-flags-list');
 const neutralPointsList = document.getElementById('neutral-points-list');
 
-// Replace with your Gemini API key
-const GEMINI_API_KEY = "AIzaSyCmRSRYBlLQZOtui1RfN784sZF4Cb1EpaE";
-
 analyzeBtn.addEventListener('click', analyzeTerms);
 clearBtn.addEventListener('click', clearInput);
-
-async function analyzeWithGemini(text) {
-    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
-
-    // Clear, explicit instructions for Gemini
-    const prompt = `
-Analyze the following Terms of Service and Privacy Policy.
-Identify clauses that may be risky or harmful to the user.
-Classify them as:
-- Red Flag: High risk or very user-unfriendly
-- Yellow Flag: Medium risk or somewhat concerning
-Include neutral points.
-Give an overall safety score from 0 to 100.
-Return the results as JSON with this format:
-{
-  "score": number,
-  "redFlags": [{"title": string, "description": string}],
-  "neutralPoints": [{"title": string, "description": string}]
-}
-
-Terms:
-${text}
-`;
-
-    const body = {
-        contents: [
-            { parts: [{ text: prompt }] }
-        ]
-    };
-
-    const response = await fetch(url, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-goog-api-key": GEMINI_API_KEY
-        },
-        body: JSON.stringify(body)
-    });
-
-    const data = await response.json();
-    return data;
-}
 
 async function analyzeTerms() {
     const text = termsInput.value.trim();
@@ -67,7 +22,7 @@ async function analyzeTerms() {
     feather.replace();
 
     try {
-        // Call your server instead of Gemini directly
+        // Call your server
         const response = await fetch("/analyze", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -76,9 +31,10 @@ async function analyzeTerms() {
 
         const data = await response.json();
 
+        // Try to parse JSON returned from Gemini
         let analysis;
         try {
-            analysis = JSON.parse(data.text); // Parse Gemini JSON
+            analysis = JSON.parse(data.text);
         } catch {
             analysis = {
                 score: 50,
@@ -118,26 +74,22 @@ function displayResults(analysis) {
         scoreBar.className = "h-4 rounded-full bg-red-500";
     }
 
-    // Populate red flags
     redFlagsList.innerHTML = "";
     analysis.redFlags.forEach(flag => {
         redFlagsList.innerHTML += `
         <div class="p-4 border-l-4 border-red-500 bg-red-50 rounded-r">
             <h5 class="font-semibold text-red-800">${flag.title}</h5>
             <p class="text-gray-700 mt-1">${flag.description}</p>
-        </div>
-        `;
+        </div>`;
     });
 
-    // Populate neutral points
     neutralPointsList.innerHTML = "";
     analysis.neutralPoints.forEach(point => {
         neutralPointsList.innerHTML += `
         <div class="p-4 border-l-4 border-blue-500 bg-blue-50 rounded-r">
             <h5 class="font-semibold text-blue-800">${point.title}</h5>
             <p class="text-gray-700 mt-1">${point.description}</p>
-        </div>
-        `;
+        </div>`;
     });
 
     resultsSection.scrollIntoView({ behavior: 'smooth' });
