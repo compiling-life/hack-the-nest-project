@@ -98,6 +98,7 @@ function markdownToHTML(md) {
     // Wrap list items in <ul>
     if (html.includes('<li>')) {
         html = html.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
+        html = html.replace(/<\/li>/g, '</li><br>');
     }
     return html;
 }
