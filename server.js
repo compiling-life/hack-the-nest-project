@@ -32,43 +32,43 @@ const auth = new GoogleAuth({
 
 // Analyze route
 app.post("/analyze", async (req, res) => {
-  try {
-    const client = await auth.getClient();
-    const url =
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${await client.getAccessToken()}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: `Analyze the following terms:\n\n${req.body.terms}`,
-              },
-            ],
-          },
-        ],
-      }),
-    });
-
-    const data = await response.json();
-    console.log("Gemini API response:", data);
-
-    if (data.candidates && data.candidates.length > 0) {
-      res.json({ output: data.candidates[0].content.parts[0].text });
-    } else {
-      res.status(500).json({ error: "No response from AI" });
+    try {
+      const client = await auth.getClient();
+      const url =
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+  
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${await client.getAccessToken()}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `Analyze the following terms:\n\n${req.body.terms}`,
+                },
+              ],
+            },
+          ],
+        }),
+      });
+  
+      const data = await response.json();
+      console.log("Gemini API response:", JSON.stringify(data, null, 2));
+  
+      if (data.candidates && data.candidates.length > 0) {
+        res.json({ output: data.candidates[0].content.parts[0].text });
+      } else {
+        res.status(500).json({ error: "Gemini did not return candidates", details: data });
+      }
+    } catch (err) {
+      console.error("Error in /analyze:", err);
+      res.status(500).json({ error: "Exception in /analyze", details: err.message });
     }
-  } catch (err) {
-    console.error("Error:", err);
-    res.status(500).json({ error: "Error analyzing terms" });
-  }
-});
+  });  
 
 // Start server
 const PORT = process.env.PORT || 3000;
