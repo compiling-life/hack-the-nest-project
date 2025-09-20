@@ -3,46 +3,44 @@ import fetch from "node-fetch";
 import path from "path";
 import { fileURLToPath } from "url";
 import { GoogleAuth } from "google-auth-library";
+import fs from "fs";
 
 const app = express();
 app.use(express.json());
 
-// Serve static frontend files
+// Serve static frontend files from 'public' folder
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, "public")));
 
-// Set up Google Auth with your service account
+// Path to your service account JSON
+const SERVICE_ACCOUNT_FILE = path.join(__dirname, "terms-guard-472718-8bbd0bb7b534.json"); // change filename if needed
+const SCOPES = ["https://www.googleapis.com/auth/cloud-platform"];
+
 const auth = new GoogleAuth({
-  keyFile: path.join(__dirname, "service_account.json"),
-  scopes: "https://www.googleapis.com/auth/cloud-platform",
+  keyFile: SERVICE_ACCOUNT_FILE,
+  scopes: SCOPES,
 });
 
 app.post("/analyze", async (req, res) => {
   const { text } = req.body;
+  if (!text) return res.status(400).send("No text provided.");
 
-  if (!text) {
-    return res.status(400).send("No text provided");
-  }
+  try {
+    // Get an access token using the service account
+    const client = await auth.getClient();
+    const accessToken = await client.getAccessToken();
 
-  const prompt = `
+    const prompt = `
 You are a Terms of Service and Privacy Policy analyzer.
+
 Analyze the following text and explain potential risks, concerns, or noteworthy points for a user.
+
 You may also give a rough safety score (0-100) if possible, but respond naturally in plain text.
 
 Text:
 ${text}
 `;
-
-  try {
-    // Get access token from service account
-    const client = await auth.getClient();
-    const accessTokenResponse = await client.getAccessToken();
-    const accessToken = accessTokenResponse.token;
-
-    if (!accessToken) {
-      throw new Error("Failed to get access token from service account");
-    }
 
     // Call Gemini API
     const response = await fetch(
@@ -51,7 +49,7 @@ ${text}
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken.token || accessToken}`,
         },
         body: JSON.stringify({
           textFormat: "text",
@@ -61,14 +59,14 @@ ${text}
     );
 
     const data = await response.json();
-    console.log("Raw AI response:", JSON.stringify(data, null, 2));
+    console.log("AI raw response:", data);
 
-    const aiText = data.candidates?.[0]?.content?.[0]?.text || "";
+    const aiText = data.candidates?.[0]?.content?.[0]?.text || "No response from AI";
     res.send(aiText);
 
   } catch (err) {
-    console.error("Error calling AI:", err);
-    res.status(500).send("Error analyzing terms");
+    console.error("Error calling Gemini API:", err);
+    res.status(500).send("Error analyzing terms.");
   }
 });
 
