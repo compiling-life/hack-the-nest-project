@@ -32,18 +32,28 @@ async function analyzeTerms() {
         const data = await response.json();
 
         // Try to parse JSON returned from Gemini
-        let analysis;
-        try {
-            analysis = JSON.parse(data.text);
-        } catch {
-            analysis = {
-                score: 50,
-                redFlags: [{ title: "Parsing Error", description: data.text }],
-                neutralPoints: []
-            };
-        }
+let analysis;
+try {
+    // data is already JSON from the server
+    analysis = await response.json();
 
-        displayResults(analysis);
+    // Optional: ensure all required fields exist
+    analysis.score = analysis.score ?? 50;
+    analysis.redFlags = analysis.redFlags ?? [];
+    analysis.neutralPoints = analysis.neutralPoints ?? [];
+
+} catch (err) {
+    console.error("Error parsing analysis JSON:", err);
+    analysis = {
+        score: 50,
+        redFlags: [{ title: "Parsing Error", description: "Failed to parse Gemini output." }],
+        neutralPoints: []
+    };
+}
+
+// Display results on the frontend
+displayResults(analysis);
+
 
     } catch (err) {
         console.error(err);
