@@ -30,9 +30,14 @@ app.post("/analyze", async (req, res) => {
     }
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `Analyze the following terms of service or privacy policy:\n\n${termsText}`,
+        model: "gemini-2.5-flash",
+        contents: `Analyze these terms and only report red and yellow flags of the terms of agreement and avoid complex wording and try to use exact quotes to explain reasoning from the terms of agreement. Use bullet points and headings:
+    **Red Flags**
+    **Yellow Flags**
+    Terms:
+    ${req.body.terms}`
     });
+    
 
     res.json({ output: response.text });
   } catch (err) {
