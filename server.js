@@ -4,7 +4,7 @@ import { GoogleAuth } from "google-auth-library";
 
 const app = express();
 app.use(express.json());
-
+// -
 // Load credentials from Render env var
 if (!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
   throw new Error("Missing GOOGLE_APPLICATION_CREDENTIALS_JSON env var");
