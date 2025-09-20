@@ -1,26 +1,24 @@
 import express from "express";
 import fetch from "node-fetch";
 import { GoogleAuth } from "google-auth-library";
-
 import path from "path";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve static files from public folder
-app.use(express.static(path.join(__dirname, "public")));
-
-app.get("/", (req, res) => {
-    res.send("✅ Server is running. Use POST /analyze to analyze terms.");
-  });
-  
-
-
 const app = express();
 app.use(express.json());
-// -
-// Load credentials from Render env var
+
+// Serve static files from "public" folder
+app.use(express.static(path.join(__dirname, "public")));
+
+// Root route (homepage)
+app.get("/", (req, res) => {
+  res.send("✅ Server is running. Use POST /analyze to analyze terms.");
+});
+
+// Load credentials from Render environment variable
 if (!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
   throw new Error("Missing GOOGLE_APPLICATION_CREDENTIALS_JSON env var");
 }
@@ -36,7 +34,8 @@ const auth = new GoogleAuth({
 app.post("/analyze", async (req, res) => {
   try {
     const client = await auth.getClient();
-    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+    const url =
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
     const response = await fetch(url, {
       method: "POST",
@@ -72,8 +71,7 @@ app.post("/analyze", async (req, res) => {
 });
 
 // Start server
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
