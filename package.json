@@ -1,10 +1,11 @@
 {
   "name": "nestseal-java",
   "version": "1.0.0",
-  "description": "This is a website that is desinged to scan Terms of Service (TOS) Agreements for harmful keywords (Eg. Privacy Violations like data collection without you knowing).",
+  "description": "This is a website that is designed to scan Terms of Service (TOS) Agreements for harmful keywords (Eg. Privacy Violations like data collection without you knowing).",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
