@@ -9,7 +9,8 @@ const safetyBadge = document.getElementById('safety-badge');
 const scoreValue = document.getElementById('score-value');
 const scoreBar = document.getElementById('score-bar');
 const redFlagsList = document.getElementById('red-flags-list');
-const neutralPointsList = document.getElementById('neutral-points-list');
+const yellowFlagsList = document.getElementById('neutral-points-list'); // repurposed for yellow flags
+const neutralPointsList = document.getElementById('neutral-points-list'); // optional if you add separate container
 
 analyzeBtn.addEventListener('click', analyzeTerms);
 clearBtn.addEventListener('click', clearInput);
@@ -28,11 +29,12 @@ async function analyzeTerms() {
             body: JSON.stringify({ text })
         });
 
-        const analysis = await response.json(); // <- THIS IS ALREADY JSON!
+        const analysis = await response.json();
 
-        // Ensure required fields exist
+        // Ensure all fields exist
         analysis.score = analysis.score ?? 50;
         analysis.redFlags = analysis.redFlags ?? [];
+        analysis.yellowFlags = analysis.yellowFlags ?? [];
         analysis.neutralPoints = analysis.neutralPoints ?? [];
 
         displayResults(analysis);
@@ -66,6 +68,7 @@ function displayResults(analysis) {
         scoreBar.className = "h-4 rounded-full bg-red-500";
     }
 
+    // Red Flags
     redFlagsList.innerHTML = "";
     analysis.redFlags.forEach(flag => {
         redFlagsList.innerHTML += `
@@ -75,14 +78,25 @@ function displayResults(analysis) {
         </div>`;
     });
 
-    neutralPointsList.innerHTML = "";
-    analysis.neutralPoints.forEach(point => {
-        neutralPointsList.innerHTML += `
-        <div class="p-4 border-l-4 border-blue-500 bg-blue-50 rounded-r">
-            <h5 class="font-semibold text-blue-800">${point.title}</h5>
-            <p class="text-gray-700 mt-1">${point.description}</p>
+    // Yellow Flags
+    yellowFlagsList.innerHTML = "";
+    analysis.yellowFlags.forEach(flag => {
+        yellowFlagsList.innerHTML += `
+        <div class="p-4 border-l-4 border-yellow-500 bg-yellow-50 rounded-r">
+            <h5 class="font-semibold text-yellow-800">${flag.title}</h5>
+            <p class="text-gray-700 mt-1">${flag.description}</p>
         </div>`;
     });
+
+    // Neutral Points (optional separate section if you want)
+    // neutralPointsList.innerHTML = "";
+    // analysis.neutralPoints.forEach(point => {
+    //     neutralPointsList.innerHTML += `
+    //     <div class="p-4 border-l-4 border-blue-500 bg-blue-50 rounded-r">
+    //         <h5 class="font-semibold text-blue-800">${point.title}</h5>
+    //         <p class="text-gray-700 mt-1">${point.description}</p>
+    //     </div>`;
+    // });
 
     resultsSection.scrollIntoView({ behavior: 'smooth' });
 }
