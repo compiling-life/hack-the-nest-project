@@ -46,17 +46,47 @@ async function analyzeTerms() {
     }
 }
 
-// Typing effect function
-function displayTyping(text) {
+// Typing effect function with HTML/Markdown support
+function displayTyping(html) {
+    const container = aiOutput;
     let i = 0;
-    const interval = setInterval(() => {
-        aiOutput.innerHTML += text[i];
+
+    // Split HTML into tags and text
+    const chunks = html.match(/(<[^>]+>|[^<]+)/g);
+
+    function typeChunk() {
+        if (i >= chunks.length) return;
+
+        const chunk = chunks[i];
+
+        if (chunk.startsWith('<')) {
+            // Append HTML tags immediately
+            container.innerHTML += chunk;
+        } else {
+            // Type text character by character
+            let charIndex = 0;
+            function typeChar() {
+                if (charIndex < chunk.length) {
+                    container.innerHTML += chunk[charIndex];
+                    charIndex++;
+                    setTimeout(typeChar, 15); // adjust typing speed here
+                } else {
+                    i++;
+                    typeChunk();
+                }
+            }
+            typeChar();
+            return;
+        }
+
         i++;
-        if (i >= text.length) clearInterval(interval);
-    }, 15); // adjust speed here
+        typeChunk();
+    }
+
+    typeChunk();
 }
 
-// Basic Markdown to HTML converter
+// Markdown to HTML converter
 function markdownToHTML(md) {
     let html = md
         .replace(/^### (.*$)/gim, '<h3>$1</h3>')
