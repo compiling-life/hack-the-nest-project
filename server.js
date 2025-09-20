@@ -62,7 +62,41 @@ ${text}
                     "Content-Type": "application/json",
                     "X-goog-api-key": process.env.GEMINI_API_KEY,
                 },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+                body: JSON.stringify({
+                    instructions: prompt,
+                    response_format: {
+                      type: "json_schema",
+                      json_schema: {
+                        type: "object",
+                        properties: {
+                          score: { type: "number" },
+                          redFlags: {
+                            type: "array",
+                            items: {
+                              type: "object",
+                              properties: {
+                                title: { type: "string" },
+                                description: { type: "string" }
+                              },
+                              required: ["title", "description"]
+                            }
+                          },
+                          neutralPoints: {
+                            type: "array",
+                            items: {
+                              type: "object",
+                              properties: {
+                                title: { type: "string" },
+                                description: { type: "string" }
+                              },
+                              required: ["title", "description"]
+                            }
+                          }
+                        },
+                        required: ["score", "redFlags", "neutralPoints"]
+                      }
+                    }
+                  })                  
             }
         );
 
