@@ -52,8 +52,8 @@ function displayResults(aiText) {
     redFlagsList.innerHTML = "";
     neutralPointsList.innerHTML = "";
 
-    // Extract score from text
-    const scoreMatch = aiText.match(/score\s*[:\-]?\s*(\d{1,3})/i);
+    // --- Improved score extraction ---
+    const scoreMatch = aiText.match(/(?:overall\s*score|score)[^\d]{0,5}(\d{1,3})/i);
     let score = scoreMatch ? parseInt(scoreMatch[1]) : null;
 
     if (score !== null) {
@@ -75,21 +75,33 @@ function displayResults(aiText) {
         }
     }
 
-    // Extract Red and Yellow Flags
+    // --- Improved flags extraction ---
     const lines = aiText.split(/\r?\n/);
     let currentSection = null;
 
     lines.forEach(line => {
+        line = line.trim();
+        if (!line) return;
+
+        // Section detection (more flexible)
         if (/red flag/i.test(line)) currentSection = 'red';
         else if (/yellow flag/i.test(line)) currentSection = 'yellow';
         else if (/neutral/i.test(line)) currentSection = null;
 
-        if (currentSection === 'red' && line.trim() && !/red flag/i.test(line)) {
-            redFlagsList.innerHTML += `<div class="p-4 border-l-4 border-red-500 bg-red-50 rounded-r"><p class="text-gray-700">${line.trim()}</p></div>`;
-        }
-
-        if (currentSection === 'yellow' && line.trim() && !/yellow flag/i.test(line)) {
-            neutralPointsList.innerHTML += `<div class="p-4 border-l-4 border-yellow-500 bg-yellow-50 rounded-r"><p class="text-gray-700">${line.trim()}</p></div>`;
+        // List items detection (lines starting with dash or number)
+        if (currentSection && /^[-\d.]/.test(line)) {
+            const cleanLine = line.replace(/^[-\d.\s]+/, ''); // remove dash or number
+            if (currentSection === 'red') {
+                redFlagsList.innerHTML += `
+                <div class="p-4 border-l-4 border-red-500 bg-red-50 rounded-r">
+                    <p class="text-gray-700">${cleanLine}</p>
+                </div>`;
+            } else if (currentSection === 'yellow') {
+                neutralPointsList.innerHTML += `
+                <div class="p-4 border-l-4 border-yellow-500 bg-yellow-50 rounded-r">
+                    <p class="text-gray-700">${cleanLine}</p>
+                </div>`;
+            }
         }
     });
 
