@@ -1,5 +1,5 @@
 # **Welcome to TERMSGard!** #
-This is a website that is desinged to scan Terms of Service (TOS) Agreements for harmful keywords (Eg. Volation of rights).
+This is a website that is desinged to scan Terms of Service (TOS) Agreements for harmful keywords (Eg. Privacy Violations like data collection without you knowing).
 
 ## **It will do this by:** ##
 1. scaning text that a user pastes into a textbox that has a button under it that the user presses.
