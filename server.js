@@ -2,6 +2,16 @@ import express from "express";
 import fetch from "node-fetch";
 import { GoogleAuth } from "google-auth-library";
 
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static files from public folder
+app.use(express.static(path.join(__dirname, "public")));
+
+
 const app = express();
 app.use(express.json());
 // -
@@ -57,6 +67,10 @@ app.post("/analyze", async (req, res) => {
 });
 
 // Start server
+app.get("/", (req, res) => {
+    res.send("✅ Server is running. Use POST /analyze to analyze terms.");
+  });
+  
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
