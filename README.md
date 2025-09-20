@@ -10,4 +10,6 @@ This is a website that is desinged to scan Terms of Service (TOS) Agreements for
 - The website will be hosted on onrender.com
 - The CSS will be done using Tailwindcss
 
+Site link 👉🏻 [TERMSguard](https://termsguard.onrender.com/)
+
 Copyright 2025© TERMSGard for Hackthenest.
