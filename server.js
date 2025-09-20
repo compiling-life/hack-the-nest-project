@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 const ai = new GoogleGenAI({
   credentials: JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON),
 });
-
+// --
 // Analyze terms route
 app.post("/analyze", async (req, res) => {
   try {
