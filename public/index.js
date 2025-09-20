@@ -11,8 +11,8 @@ analyzeBtn.addEventListener('click', analyzeTerms);
 clearBtn.addEventListener('click', clearInput);
 
 async function analyzeTerms() {
-    const text = termsInput.value.trim();
-    if (!text) {
+    const terms = termsInput.value.trim(); // MUST match backend key
+    if (!terms) {
         alert('Please paste some terms first.');
         return;
     }
@@ -24,24 +24,29 @@ async function analyzeTerms() {
         const response = await fetch("/analyze", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text })
+            body: JSON.stringify({ terms }) // key is now 'terms'
         });
 
-        const aiText = await response.text();
-        displayResults(aiText);
+        const data = await response.json();
+
+        if (data.error) {
+            displayResults(`❌ ${data.error}`);
+        } else {
+            displayResults(data.output);
+        }
 
     } catch (err) {
         console.error("Error fetching AI:", err);
-        alert("Error analyzing terms. Check console for details.");
+        displayResults("❌ Error analyzing terms. Check console for details.");
     } finally {
         analyzeBtn.innerHTML = '<i class="w-5 h-5 mr-2"></i> Analyze Terms';
         feather.replace();
     }
 }
 
-function displayResults(aiText) {
+function displayResults(text) {
     resultsSection.classList.remove('hidden');
-    aiOutput.innerHTML = `<pre class="whitespace-pre-wrap text-gray-700">${aiText}</pre>`;
+    aiOutput.innerHTML = `<pre class="whitespace-pre-wrap text-gray-700">${text}</pre>`;
     resultsSection.scrollIntoView({ behavior: 'smooth' });
 }
 
