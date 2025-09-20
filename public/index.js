@@ -109,22 +109,22 @@ function clearInput() {
 }
 
 // About Me Modal
-const aboutLink = document.querySelector('a[href="about-me"]');
+const aboutLink = document.querySelector('a[href="about-me"]'); // selects your link
 const aboutModal = document.getElementById('about-modal');
 const closeModal = document.getElementById('close-modal');
 
 aboutLink.addEventListener('click', (e) => {
-  e.preventDefault(); // Prevent the default link behavior
-  aboutModal.classList.remove('hidden');
+    e.preventDefault(); // prevents the page from navigating
+    aboutModal.classList.remove('hidden'); // shows the modal
 });
 
 closeModal.addEventListener('click', () => {
-  aboutModal.classList.add('hidden');
+    aboutModal.classList.add('hidden'); // hides the modal when clicking the X
 });
 
-// Close modal when clicking outside content
+// Close modal when clicking outside of the modal content
 window.addEventListener('click', (e) => {
-  if (e.target === aboutModal) {
-    aboutModal.classList.add('hidden');
-  }
+    if (e.target === aboutModal) {
+        aboutModal.classList.add('hidden');
+    }
 });
