@@ -16,7 +16,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // Path to your service account JSON
 const SERVICE_ACCOUNT_FILE = path.join(__dirname, "terms-guard-472718-8bbd0bb7b534.json"); // change filename if needed
 const SCOPES = ["https://www.googleapis.com/auth/cloud-platform"];
-
+// d
 const auth = new GoogleAuth({
   keyFile: SERVICE_ACCOUNT_FILE,
   scopes: SCOPES,
