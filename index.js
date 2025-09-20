@@ -20,11 +20,25 @@ const GEMINI_API_KEY = "AIzaSyCmRSRYBlLQZOtui1RfN784sZF4Cb1EpaE";
 async function analyzeWithGemini(text) {
     const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
+    // This prompt tells Gemini exactly what to look for
+    const prompt = `
+Analyze the following Terms of Service and Privacy Policy. 
+Identify any clauses that may be risky, unfair, or harmful to the user. 
+Classify them as:
+- Red Flag: High risk or very user-unfriendly
+- Yellow Flag: Medium risk or somewhat concerning
+Also include neutral points and give an overall safety score from 0 to 100. 
+Respond in a clear format that can be displayed directly in a web UI.
+
+Terms:
+${text}
+`;
+
     const body = {
         contents: [
             {
                 parts: [
-                    { text: "Analyze the following terms of service and privacy policy. List potential red flags, neutral points, and give a score out of 100:\n\n" + text }
+                    { text: prompt }
                 ]
             }
         ]
@@ -42,6 +56,7 @@ async function analyzeWithGemini(text) {
     const data = await response.json();
     return data;
 }
+
 
 async function analyzeTerms() {
     const text = termsInput.value.trim();
