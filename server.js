@@ -8,53 +8,53 @@ import fs from "fs";
 const app = express();
 app.use(express.json());
 
-// Serve static frontend files from 'public' folder
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, "public")));
 
-// Path to your service account JSON
-const SERVICE_ACCOUNT_FILE = path.join(__dirname, "termsguard.json"); // change filename if needed
-const SCOPES = ["https://www.googleapis.com/auth/cloud-platform"];
-// d
+// Load service account JSON
+const serviceAccountPath = path.join(__dirname, "termsguard.json");
+const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
+
+// Google Auth setup
 const auth = new GoogleAuth({
-  keyFile: SERVICE_ACCOUNT_FILE,
-  scopes: SCOPES,
+  credentials: serviceAccount,
+  scopes: ["https://www.googleapis.com/auth/cloud-platform"]
 });
+
+async function getAccessToken() {
+  const client = await auth.getClient();
+  const tokenResponse = await client.getAccessToken();
+  return tokenResponse.token;
+}
 
 app.post("/analyze", async (req, res) => {
   const { text } = req.body;
-  if (!text) return res.status(400).send("No text provided.");
 
-  try {
-    // Get an access token using the service account
-    const client = await auth.getClient();
-    const accessToken = await client.getAccessToken();
-
-    const prompt = `
+  const prompt = `
 You are a Terms of Service and Privacy Policy analyzer.
 
 Analyze the following text and explain potential risks, concerns, or noteworthy points for a user.
-
-You may also give a rough safety score (0-100) if possible, but respond naturally in plain text.
 
 Text:
 ${text}
 `;
 
-    // Call Gemini API
+  try {
+    const accessToken = await getAccessToken();
+
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken.token || accessToken}`,
+          "Authorization": `Bearer ${accessToken}`
         },
         body: JSON.stringify({
           textFormat: "text",
-          contents: [{ parts: [{ text: prompt }] }],
-        }),
+          contents: [{ parts: [{ text: prompt }] }]
+        })
       }
     );
 
@@ -65,8 +65,8 @@ ${text}
     res.send(aiText);
 
   } catch (err) {
-    console.error("Error calling Gemini API:", err);
-    res.status(500).send("Error analyzing terms.");
+    console.error(err);
+    res.status(500).send("Error analyzing terms");
   }
 });
 
