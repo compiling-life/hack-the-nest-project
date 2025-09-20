@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TermsGuard - Analyze Terms & Agreements</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+<script src="https://unpkg.com/feather-icons"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+<style>
+
+html 
+{
+    scroll-behavior: smooth;
+}
+
+.gradient-bg 
+{
+    background: linear-gradient(135deg, #545ad1 0%, #6167da 100%);
+}
+
+.text-area-shadow 
+{
+    box-shadow: 0 10px 30px rgba(0, 13, 255, 0.2);
+}
+
+.pulse-animation 
+{
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse 
+{
+    0% { transform: scale(1); }
+
+    50% { transform: scale(1.05); }
+
+    100% { transform: scale(1); }
+}
+
+</style>
+
+</head>
+
+<body class="min-h-screen bg-gray-50">
+
+<header class="gradient-bg text-white">
+
+<div class="container mx-auto px-6 py-12">
+
+<div class="flex justify-between items-center">
+
+<div class="flex items-center">
+
+<i data-feather="shield" class="w-8 h-8 mr-3"></i>
+
+<h1 class="text-2xl font-bold">TermsGuard</h1>
+
+</div>
+
+<nav class="hidden md:block">
+
+<ul class="flex space-x-8">
+
+<li><a href="#how-it-works" class="hover:underline">How It Works</a></li>
+
+</ul>
+
+</nav>
+
+<button class="md:hidden">
+
+<i data-feather="menu"></i>
+
+</button>
+
+</div>
+
+<div class="mt-16 text-center" data-aos="fade-up">
+
+<h2 class="text-4xl md:text-5xl font-bold mb-6">Analyze Terms & Agreements</h2>
+
+<p class="text-xl max-w-2xl mx-auto">Paste any terms of service or privacy policy to check for potential risks.</p>
+
+</div>
+
+</div>
+
+</header>
+
+<main class="container mx-auto px-6 py-16">
+
+<div class="max-w-4xl mx-auto">
+
+<div class="mb-12" data-aos="fade-up">
+
+<div class="bg-white rounded-xl p-6 text-area-shadow">
+
+<div class="flex justify-between items-center mb-4">
+
+<h3 class="text-xl font-semibold text-gray-800">Paste your terms here</h3>
+
+<button id="clear-btn" class="text-blue-600 hover:text-blue-800 flex items-center"> 
+    
+<i data-feather="trash-2" class="w-4 h-4 mr-1"></i> Clear 
+
+</button>
+
+</div>
+
+<textarea id="terms-input" class="w-full h-64 p-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Paste terms of service, privacy policy, or any agreement text here..."></textarea>
+
+<div class="flex justify-end mt-4">
+
+<button id="analyze-btn" class="gradient-bg text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition flex items-center pulse-animation">
+    
+<i data-feather="search" class="w-5 h-5 mr-2"></i> Analyze Terms
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div id="results-section" class="hidden" data-aos="fade-up">
+
+<div class="bg-white rounded-xl p-6 shadow-lg">
+
+<div class="flex items-center mb-6">
+
+<h3 class="text-2xl font-bold text-gray-800">Analysis Results</h3>
+
+<span id="safety-badge" class="ml-4 px-4 py-1 rounded-full text-sm font-medium"></span>
+
+</div>
+
+<div id="overall-score" class="mb-8">
+
+<div class="flex justify-between mb-2">
+    
+<span class="font-medium">Overall Safety Score</span>
+    
+<span id="score-value" class="font-bold"></span>
+
+</div>
+
+<div class="w-full bg-gray-200 rounded-full h-4">
+    
+<div id="score-bar" class="h-4 rounded-full"></div>
+
+</div>
+
+</div>
+
+<div id="red-flags" class="mb-8">
+
+<h4 class="text-lg font-semibold mb-4 flex items-center">
+    
+<i data-feather="alert-triangle" class="w-5 h-5 mr-2 text-red-500"></i> Potential Red Flags
+
+</h4>
+
+<div id="red-flags-list" class="space-y-4"></div>
+
+</div>
+
+<div id="neutral-points">
+
+<h4 class="text-lg font-semibold mb-4 flex items-center">
+    
+<i data-feather="info" class="w-5 h-5 mr-2 text-yellow-500"></i> Potential Yellow Flags
+
+</h4>
+
+<div id="neutral-points-list" class="space-y-4"></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</main>
+
+<section id="how-it-works" class="bg-gray-100 py-16">
+
+<div class="container mx-auto px-6">
+
+<h2 class="text-3xl font-bold text-center mb-12" data-aos="fade-up">How TermsGuard Works</h2>
+
+<div class="grid md:grid-cols-3 gap-8">
+
+<div class="bg-white p-6 rounded-xl shadow-md" data-aos="fade-up" data-aos-delay="100">
+
+<div class="w-12 h-12 gradient-bg rounded-full flex items-center justify-center mb-4">
+
+<i data-feather="clipboard" class="w-6 h-6 text-white"></i>
+
+</div>
+
+<h3 class="text-xl font-semibold mb-2">Paste</h3>
+
+<p class="text-gray-600">Copy and paste any terms of service or privacy policy into our analyzer.</p>
+
+</div>
+
+<div class="bg-white p-6 rounded-xl shadow-md" data-aos="fade-up" data-aos-delay="200">
+
+<div class="w-12 h-12 gradient-bg rounded-full flex items-center justify-center mb-4">
+
+<i data-feather="search" class="w-6 h-6 text-white"></i>
+
+</div>
+
+<h3 class="text-xl font-semibold mb-2">Analysis</h3>
+
+<p class="text-gray-600">Our system scans for unfair claims, data collection, & hidden terms.</p>
+
+</div>
+
+<div class="bg-white p-6 rounded-xl shadow-md" data-aos="fade-up" data-aos-delay="300">
+
+<div class="w-12 h-12 gradient-bg rounded-full flex items-center justify-center mb-4">
+
+<i data-feather="shield" class="w-6 h-6 text-white"></i>
+
+</div>
+
+<h3 class="text-xl font-semibold mb-2">Results</h3>
+
+<p class="text-gray-600">Receive a detailed scan of potential risks and what they mean for you.</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<footer class="bg-gray-900 text-white py-12">
+
+<div class="container mx-auto px-6">
+
+<div class="grid md:grid-cols-4 gap-8">
+
+<div>
+
+<div class="flex items-center mb-4">
+
+<i data-feather="shield" class="w-8 h-8 mr-3"></i>
+
+<h3 class="text-xl font-bold">TermsGuard</h3>
+
+</div>
+
+<p class="text-gray-400">Protecting your privacy by analyzing terms of service and privacy policies.</p>
+
+</div>
+
+<div>
+
+<h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+
+<ul class="space-y-2">
+
+<li><a href="#" class="text-gray-400 hover:text-white">Analyzer</a></li>
+
+<li><a href="#how-it-works" class="text-gray-400 hover:text-white">How It Works</a></li>
+
+</ul>
+
+</div>
+
+<div>
+
+<h4 class="text-lg font-semibold mb-4">Contact</h4>
+
+<ul class="space-y-2">
+
+<li class="flex items-center text-gray-400"><i data-feather="mail" class="w-4 h-4 mr-2"></i> farisfarag452@yahoo.com </li>
+
+<li class="flex items-center text-gray-400"><i data-feather="mail" class="w-4 h-4 mr-2"></i> zachary.duriancik@gmail.com </li>
+
+<li class="flex items-center text-gray-400"><i data-feather="mail" class="w-4 h-4 mr-2"></i> ntge31@gmail.com </li>
+
+</ul>
+
+</div>
+
+</div>
+
+<div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
+
+<p>©2025 TermsGuard. Produced For Hack The Nest.</p>
+
+</div>
+
+</div>
+
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- CHATGPT CODE, JUST FOR TESTING PRINTING PURPOSES -->
+
+<script>
+
+AOS.init();
+
+feather.replace();
+
+// Sample analysis data (in a real app, this would come from an API)
+const sampleAnalysis = {
+score: 72,
+safety: "Moderate",
+redFlags: [
+{
+title: "Data Sharing with Third Parties",
+description: "The terms allow sharing your data with numerous third-party services without clear limitations.",
+severity: "high"
+},
+{
+title: "Arbitration Clause",
+description: "Contains a mandatory arbitration clause that limits your ability to sue in court.",
+severity: "medium"
+},
+{
+title: "Automatic Renewal",
+description: "The agreement includes an automatic renewal clause that may lead to unexpected charges.",
+severity: "medium"
+}
+],
+neutralPoints: [
+{
+title: "Data Retention Policy",
+description: "The policy states data will be retained for 12 months after account closure."
+},
+{
+title: "Cookie Usage",
+description: "The terms clearly explain cookie usage and provide opt-out options."
+}
+]
+};
+
+const analyzeBtn = document.getElementById('analyze-btn');
+
+const clearBtn = document.getElementById('clear-btn');
+
+const termsInput = document.getElementById('terms-input');
+
+const resultsSection = document.getElementById('results-section');
+
+const safetyBadge = document.getElementById('safety-badge');
+
+const scoreValue = document.getElementById('score-value');
+
+const scoreBar = document.getElementById('score-bar');
+
+const redFlagsList = document.getElementById('red-flags-list');
+
+const neutralPointsList = document.getElementById('neutral-points-list');
+
+analyzeBtn.addEventListener('click', analyzeTerms);
+
+clearBtn.addEventListener('click', clearInput);
+
+function analyzeTerms() 
+{
+    const text = termsInput.value.trim();
+
+    if (!text) 
+    {
+        alert('Please paste some terms text to analyze.');
+
+        return;
+    }
+
+    analyzeBtn.innerHTML = '<i data-feather="loader" class="w-5 h-5 mr-2 animate-spin"></i> Analyzing...';
+
+    feather.replace();
+
+    setTimeout(() => 
+    {
+        displayResults(sampleAnalysis);
+
+        analyzeBtn.innerHTML = '<i data-feather="search" class="w-5 h-5 mr-2"></i> Analyze Terms';
+
+        feather.replace();
+    }, 1500);
+}
+
+function displayResults(analysis) 
+{
+    resultsSection.classList.remove('hidden');
+
+    scoreValue.textContent = `${analysis.score}/100`;
+
+    scoreBar.style.width = `${analysis.score}%`;
+
+    safetyBadge.textContent = analysis.safety;
+
+    if (analysis.score >= 80) 
+    {
+        safetyBadge.classList.add('bg-green-100', 'text-green-800');
+
+        scoreBar.classList.add('bg-green-500');
+    } 
+    
+    else if (analysis.score >= 50) 
+    {
+        safetyBadge.classList.add('bg-yellow-100', 'text-yellow-800');
+
+        scoreBar.classList.add('bg-yellow-500');
+    } 
+    
+    else 
+    {
+        safetyBadge.classList.add('bg-red-100', 'text-red-800');
+
+        scoreBar.classList.add('bg-red-500');
+    }
+    
+    redFlagsList.innerHTML = '';
+
+    analysis.redFlags.forEach(flag => 
+    {
+        const severityColor = flag.severity === 'high' ? 'red' : 'yellow';
+
+        redFlagsList.innerHTML += `
+
+        <div class="p-4 border-l-4 border-${severityColor}-500 bg-${severityColor}-50 rounded-r">
+
+        <h5 class="font-semibold text-${severityColor}-800">${flag.title}</h5>
+
+        <p class="text-gray-700 mt-1">${flag.description}</p>
+
+        </div>
+        `;
+    });
+    
+    neutralPointsList.innerHTML = '';
+
+    analysis.neutralPoints.forEach(point => 
+    {
+        neutralPointsList.innerHTML += `
+
+        <div class="p-4 border-l-4 border-blue-500 bg-blue-50 rounded-r">
+
+        <h5 class="font-semibold text-blue-800">${point.title}</h5>
+
+        <p class="text-gray-700 mt-1">${point.description}</p>
+
+        </div>
+        `;
+    });
+    
+    resultsSection.scrollIntoView({ behavior: 'smooth' });
+}
+
+function clearInput() 
+{
+    termsInput.value = '';
+
+    resultsSection.classList.add('hidden');
+}
+
+</script>
+
+</body>
+
+</html>
