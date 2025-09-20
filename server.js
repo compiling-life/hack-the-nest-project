@@ -55,16 +55,17 @@ ${text}
 
     const data = await response.json();
 
+    // Aimlapi returns output text in `response` or `text`
     let jsonText = data.response || data.text || "";
 
-    // Remove backticks or extra formatting
+    // Clean backticks or extra formatting
     jsonText = jsonText.trim().replace(/^```json/, "").replace(/```$/, "");
 
     let analysis;
     try {
       analysis = JSON.parse(jsonText);
 
-      // Ensure fields exist
+      // Ensure required fields exist
       analysis.score = analysis.score ?? 50;
       analysis.redFlags = analysis.redFlags ?? [];
       analysis.yellowFlags = analysis.yellowFlags ?? [];
