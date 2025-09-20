@@ -107,3 +107,24 @@ function clearInput() {
     resultsSection.classList.add('hidden');
     aiOutput.innerHTML = '';
 }
+
+// About Me Modal
+const aboutLink = document.querySelector('a[href="about-me"]');
+const aboutModal = document.getElementById('about-modal');
+const closeModal = document.getElementById('close-modal');
+
+aboutLink.addEventListener('click', (e) => {
+  e.preventDefault(); // Prevent the default link behavior
+  aboutModal.classList.remove('hidden');
+});
+
+closeModal.addEventListener('click', () => {
+  aboutModal.classList.add('hidden');
+});
+
+// Close modal when clicking outside content
+window.addEventListener('click', (e) => {
+  if (e.target === aboutModal) {
+    aboutModal.classList.add('hidden');
+  }
+});
