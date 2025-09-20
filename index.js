@@ -61,28 +61,28 @@ ${text}
 
 async function analyzeTerms() {
     const text = termsInput.value.trim();
-    if (!text) {
-        alert('Please paste some terms text to analyze.');
-        return;
-    }
+    if (!text) { alert('Paste some terms.'); return; }
 
-    analyzeBtn.innerHTML = '<i data-feather="loader" class="w-5 h-5 mr-2 animate-spin"></i> Analyzing...';
+    analyzeBtn.innerHTML = '<i class="w-5 h-5 mr-2 animate-spin"></i> Analyzing...';
     feather.replace();
 
     try {
-        const result = await analyzeWithGemini(text);
-        // Gemini returns text in result.candidates[0].content[0].text
-        const generatedText = result.candidates[0].content[0].text;
+        // Call your server instead of Gemini directly
+        const response = await fetch("/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text })
+        });
 
-        // Try to parse JSON from Gemini response
+        const data = await response.json();
+
         let analysis;
         try {
-            analysis = JSON.parse(generatedText);
-        } catch (err) {
-            console.error("Error parsing Gemini output as JSON:", err);
+            analysis = JSON.parse(data.text); // Parse Gemini JSON
+        } catch {
             analysis = {
                 score: 50,
-                redFlags: [{ title: "Parsing Error", description: generatedText }],
+                redFlags: [{ title: "Parsing Error", description: data.text }],
                 neutralPoints: []
             };
         }
@@ -93,7 +93,7 @@ async function analyzeTerms() {
         console.error(err);
         alert("Error analyzing terms. Check console for details.");
     } finally {
-        analyzeBtn.innerHTML = '<i data-feather="search" class="w-5 h-5 mr-2"></i> Analyze Terms';
+        analyzeBtn.innerHTML = '<i class="w-5 h-5 mr-2"></i> Analyze Terms';
         feather.replace();
     }
 }
