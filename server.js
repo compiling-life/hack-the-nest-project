@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 const ai = new GoogleGenAI({
   credentials: JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON),
 });
-
+// --
 // Analyze terms route
 app.post("/analyze", async (req, res) => {
   try {
@@ -31,7 +31,7 @@ app.post("/analyze", async (req, res) => {
 
     const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
-        contents: `Analyze these terms and only report red and yellow flags of the terms of agreement and avoid complex wording and try to use exact quotes to explain reasoning from the terms of agreement. Use bullet points and headings:
+        contents: `Analyze these terms and only report red and yellow flags of the terms of agreement and avoid complex wording and try to use exact quotes to explain reasoning from the terms of agreement, but dont produce too much and try to keep it simple and short but also good but only like 2 small sentences per thing, I want it to be simple and clean and not cluttered and too much. Use bullet points and headings:
     **Red Flags**
     **Yellow Flags**
     Terms:
