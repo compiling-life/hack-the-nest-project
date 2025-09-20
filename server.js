@@ -31,7 +31,7 @@ app.post("/analyze", async (req, res) => {
 
     const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
-        contents: `Analyze these terms and only report red and yellow flags of the terms of agreement and avoid complex wording and try to use exact quotes to explain reasoning from the terms of agreement. Use bullet points and headings:
+        contents: `Analyze these terms and only report red and yellow flags of the terms of agreement and avoid complex wording and try to use exact quotes to explain reasoning from the terms of agreement, but dont produce too much and try to keep it simple and short but also good. Use bullet points and headings:
     **Red Flags**
     **Yellow Flags**
     Terms:
