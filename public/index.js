@@ -28,7 +28,7 @@ async function analyzeTerms() {
             body: JSON.stringify({ text })
         });
 
-        const aiText = await response.text(); // <-- keep as text, not JSON
+        const aiText = await response.text(); // just take AI's raw response
         displayResults(aiText);
 
     } catch (err) {
@@ -40,18 +40,19 @@ async function analyzeTerms() {
     }
 }
 
-// ---- Updated displayResults with flexible parsing ----
+// Show AI output in organized box
 function displayResults(aiText) {
     resultsSection.classList.remove('hidden');
 
+    // Reset fields
     scoreValue.textContent = "N/A";
     scoreBar.style.width = "0%";
     safetyBadge.textContent = "";
     redFlagsList.innerHTML = "";
     neutralPointsList.innerHTML = "";
 
-    // Flexible score parsing
-    const scoreMatch = aiText.match(/(?:overall\s*score|score)[^\d]{0,5}(\d{1,3})/i);
+    // Simple "score" detection
+    const scoreMatch = aiText.match(/score\s*[:=]?\s*(\d{1,3})/i);
     let score = scoreMatch ? parseInt(scoreMatch[1]) : null;
 
     if (score !== null) {
@@ -73,33 +74,11 @@ function displayResults(aiText) {
         }
     }
 
-    // Flexible flags parsing
-    const lines = aiText.split(/\r?\n/);
-    let currentSection = null;
+    // Put the AI response directly in the redFlagsList for simplicity
+    redFlagsList.innerHTML = `<pre class="whitespace-pre-wrap text-gray-700">${aiText}</pre>`;
 
-    lines.forEach(line => {
-        line = line.trim();
-        if (!line) return;
-
-        if (/red flag/i.test(line)) currentSection = 'red';
-        else if (/yellow flag/i.test(line)) currentSection = 'yellow';
-        else if (/neutral/i.test(line)) currentSection = null;
-
-        if (currentSection && /^[-\d.]/.test(line)) {
-            const cleanLine = line.replace(/^[-\d.\s]+/, '');
-            if (currentSection === 'red') {
-                redFlagsList.innerHTML += `
-                <div class="p-4 border-l-4 border-red-500 bg-red-50 rounded-r">
-                    <p class="text-gray-700">${cleanLine}</p>
-                </div>`;
-            } else if (currentSection === 'yellow') {
-                neutralPointsList.innerHTML += `
-                <div class="p-4 border-l-4 border-yellow-500 bg-yellow-50 rounded-r">
-                    <p class="text-gray-700">${cleanLine}</p>
-                </div>`;
-            }
-        }
-    });
+    // Keep yellow flags empty if you want, or could duplicate same text there
+    neutralPointsList.innerHTML = "";
 
     resultsSection.scrollIntoView({ behavior: 'smooth' });
 }
