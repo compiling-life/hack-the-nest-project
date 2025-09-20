@@ -12,4 +12,5 @@ Scanning text that a user pastes into a text-box from a TOS for unsafe practices
 Site link 👉🏻 [TERMSGuard](https://termsguard.onrender.com/)
 
 Copyright 2025© TERMSGard for Hackthenest.
+
 -# Produced By: Faris Farag, Zachary Duriancik, & Nachiket Gatne
