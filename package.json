@@ -1,0 +1,21 @@
+{
+  "name": "nestseal-java",
+  "version": "1.0.0",
+  "description": "This is a website that is designed to scan Terms of Service (TOS) Agreements for harmful keywords (Eg. Privacy Violations like data collection without you knowing).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/compiling-life/hack-the-nest-project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/compiling-life/hack-the-nest-project/issues"
+  },
+  "homepage": "https://github.com/compiling-life/hack-the-nest-project#readme"
+}
