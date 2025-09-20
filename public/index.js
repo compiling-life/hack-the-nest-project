@@ -9,8 +9,7 @@ const safetyBadge = document.getElementById('safety-badge');
 const scoreValue = document.getElementById('score-value');
 const scoreBar = document.getElementById('score-bar');
 const redFlagsList = document.getElementById('red-flags-list');
-const yellowFlagsList = document.getElementById('neutral-points-list'); // repurposed for yellow flags
-const neutralPointsList = document.getElementById('neutral-points-list'); // optional if you add separate container
+const neutralPointsList = document.getElementById('neutral-points-list');
 
 analyzeBtn.addEventListener('click', analyzeTerms);
 clearBtn.addEventListener('click', clearInput);
@@ -29,15 +28,10 @@ async function analyzeTerms() {
             body: JSON.stringify({ text })
         });
 
-        const analysis = await response.json();
+        const data = await response.json();
+        const aiText = data.text || "";
 
-        // Ensure all fields exist
-        analysis.score = analysis.score ?? 50;
-        analysis.redFlags = analysis.redFlags ?? [];
-        analysis.yellowFlags = analysis.yellowFlags ?? [];
-        analysis.neutralPoints = analysis.neutralPoints ?? [];
-
-        displayResults(analysis);
+        displayResults(aiText);
 
     } catch (err) {
         console.error(err);
@@ -48,55 +42,56 @@ async function analyzeTerms() {
     }
 }
 
-function displayResults(analysis) {
+function displayResults(aiText) {
     resultsSection.classList.remove('hidden');
 
-    scoreValue.textContent = `${analysis.score}/100`;
-    scoreBar.style.width = `${analysis.score}%`;
+    // Reset previous content
+    scoreValue.textContent = "N/A";
+    scoreBar.style.width = "0%";
+    safetyBadge.textContent = "";
+    redFlagsList.innerHTML = "";
+    neutralPointsList.innerHTML = "";
 
-    if (analysis.score >= 80) {
-        safetyBadge.textContent = "Safe";
-        safetyBadge.className = "ml-4 px-4 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800";
-        scoreBar.className = "h-4 rounded-full bg-green-500";
-    } else if (analysis.score >= 50) {
-        safetyBadge.textContent = "Moderate";
-        safetyBadge.className = "ml-4 px-4 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800";
-        scoreBar.className = "h-4 rounded-full bg-yellow-500";
-    } else {
-        safetyBadge.textContent = "High Risk";
-        safetyBadge.className = "ml-4 px-4 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800";
-        scoreBar.className = "h-4 rounded-full bg-red-500";
+    // Extract score from text
+    const scoreMatch = aiText.match(/score\s*[:\-]?\s*(\d{1,3})/i);
+    let score = scoreMatch ? parseInt(scoreMatch[1]) : null;
+
+    if (score !== null) {
+        scoreValue.textContent = `${score}/100`;
+        scoreBar.style.width = `${score}%`;
+
+        if (score >= 80) {
+            safetyBadge.textContent = "Safe";
+            safetyBadge.className = "ml-4 px-4 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800";
+            scoreBar.className = "h-4 rounded-full bg-green-500";
+        } else if (score >= 50) {
+            safetyBadge.textContent = "Moderate";
+            safetyBadge.className = "ml-4 px-4 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800";
+            scoreBar.className = "h-4 rounded-full bg-yellow-500";
+        } else {
+            safetyBadge.textContent = "High Risk";
+            safetyBadge.className = "ml-4 px-4 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800";
+            scoreBar.className = "h-4 rounded-full bg-red-500";
+        }
     }
 
-    // Red Flags
-    redFlagsList.innerHTML = "";
-    analysis.redFlags.forEach(flag => {
-        redFlagsList.innerHTML += `
-        <div class="p-4 border-l-4 border-red-500 bg-red-50 rounded-r">
-            <h5 class="font-semibold text-red-800">${flag.title}</h5>
-            <p class="text-gray-700 mt-1">${flag.description}</p>
-        </div>`;
-    });
+    // Extract Red and Yellow Flags
+    const lines = aiText.split(/\r?\n/);
+    let currentSection = null;
 
-    // Yellow Flags
-    yellowFlagsList.innerHTML = "";
-    analysis.yellowFlags.forEach(flag => {
-        yellowFlagsList.innerHTML += `
-        <div class="p-4 border-l-4 border-yellow-500 bg-yellow-50 rounded-r">
-            <h5 class="font-semibold text-yellow-800">${flag.title}</h5>
-            <p class="text-gray-700 mt-1">${flag.description}</p>
-        </div>`;
-    });
+    lines.forEach(line => {
+        if (/red flag/i.test(line)) currentSection = 'red';
+        else if (/yellow flag/i.test(line)) currentSection = 'yellow';
+        else if (/neutral/i.test(line)) currentSection = null;
 
-    // Neutral Points (optional separate section if you want)
-    // neutralPointsList.innerHTML = "";
-    // analysis.neutralPoints.forEach(point => {
-    //     neutralPointsList.innerHTML += `
-    //     <div class="p-4 border-l-4 border-blue-500 bg-blue-50 rounded-r">
-    //         <h5 class="font-semibold text-blue-800">${point.title}</h5>
-    //         <p class="text-gray-700 mt-1">${point.description}</p>
-    //     </div>`;
-    // });
+        if (currentSection === 'red' && line.trim() && !/red flag/i.test(line)) {
+            redFlagsList.innerHTML += `<div class="p-4 border-l-4 border-red-500 bg-red-50 rounded-r"><p class="text-gray-700">${line.trim()}</p></div>`;
+        }
+
+        if (currentSection === 'yellow' && line.trim() && !/yellow flag/i.test(line)) {
+            neutralPointsList.innerHTML += `<div class="p-4 border-l-4 border-yellow-500 bg-yellow-50 rounded-r"><p class="text-gray-700">${line.trim()}</p></div>`;
+        }
+    });
 
     resultsSection.scrollIntoView({ behavior: 'smooth' });
 }

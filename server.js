@@ -6,7 +6,6 @@ import { fileURLToPath } from "url";
 const app = express();
 app.use(express.json());
 
-// Serve static frontend files from 'public' folder
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, "public")));
@@ -19,73 +18,46 @@ You are a Terms of Service and Privacy Policy analyzer.
 
 Analyze the following text and identify clauses that may be risky or harmful to the user.
 
-Classify each clause as one of:
-- Red Flag: High risk or very user-unfriendly
-- Yellow Flag: Medium risk or somewhat concerning
-- Neutral Point: Not risky but informative
+Provide an overall safety score (0-100), red flags, yellow flags, and neutral points. 
+Format your response naturally in plain text. Example:
 
-Also, give an overall safety score from 0 (very unsafe) to 100 (completely safe).
-
-**Respond ONLY in JSON with this exact format**:
-
-{
-  "score": number,
-  "redFlags": [{"title": string, "description": string}],
-  "yellowFlags": [{"title": string, "description": string}],
-  "neutralPoints": [{"title": string, "description": string}]
-}
+Score: 72
+Red Flags:
+- Data Sharing: Allows sharing personal data with third parties
+- Mandatory Arbitration: Limits user's ability to sue in court
+Yellow Flags:
+- Limited Support: Customer support response times are slow
+Neutral Points:
+- Cookie Policy: Explains cookie usage clearly
 
 Terms:
 ${text}
 `;
 
   try {
-    // Call Aimlapi
-    const response = await fetch("https://api.aimlapi.com/v1/text", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.AIMLAPI_KEY}`,
-      },
-      body: JSON.stringify({
-        prompt: prompt,
-        max_tokens: 1000,
-      }),
-    });
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-goog-api-key": process.env.GEMINI_API_KEY,
+        },
+        body: JSON.stringify({
+          textFormat: "text",
+          contents: [{ parts: [{ text: prompt }] }],
+        }),
+      }
+    );
 
     const data = await response.json();
+    const aiText = data.candidates?.[0]?.content?.[0]?.text || "";
 
-    // Aimlapi returns output text in `response` or `text`
-    let jsonText = data.response || data.text || "";
-
-    // Clean backticks or extra formatting
-    jsonText = jsonText.trim().replace(/^```json/, "").replace(/```$/, "");
-
-    let analysis;
-    try {
-      analysis = JSON.parse(jsonText);
-
-      // Ensure required fields exist
-      analysis.score = analysis.score ?? 50;
-      analysis.redFlags = analysis.redFlags ?? [];
-      analysis.yellowFlags = analysis.yellowFlags ?? [];
-      analysis.neutralPoints = analysis.neutralPoints ?? [];
-
-    } catch (err) {
-      console.error("JSON parsing error:", err, "\nOriginal text:", jsonText);
-      analysis = {
-        score: 50,
-        redFlags: [],
-        yellowFlags: [],
-        neutralPoints: [],
-      };
-    }
-
-    res.json(analysis);
+    res.json({ text: aiText });
 
   } catch (err) {
     console.error(err);
-    res.status(500).send({ error: "Server error processing AI API" });
+    res.status(500).send({ error: "Server error processing Gemini API" });
   }
 });
 
