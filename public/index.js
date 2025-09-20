@@ -28,9 +28,7 @@ async function analyzeTerms() {
             body: JSON.stringify({ text })
         });
 
-        const data = await response.json();
-        const aiText = data.text || "";
-
+        const aiText = await response.text(); // <-- keep as text, not JSON
         displayResults(aiText);
 
     } catch (err) {
@@ -42,17 +40,17 @@ async function analyzeTerms() {
     }
 }
 
+// ---- Updated displayResults with flexible parsing ----
 function displayResults(aiText) {
     resultsSection.classList.remove('hidden');
 
-    // Reset previous content
     scoreValue.textContent = "N/A";
     scoreBar.style.width = "0%";
     safetyBadge.textContent = "";
     redFlagsList.innerHTML = "";
     neutralPointsList.innerHTML = "";
 
-    // --- Improved score extraction ---
+    // Flexible score parsing
     const scoreMatch = aiText.match(/(?:overall\s*score|score)[^\d]{0,5}(\d{1,3})/i);
     let score = scoreMatch ? parseInt(scoreMatch[1]) : null;
 
@@ -75,7 +73,7 @@ function displayResults(aiText) {
         }
     }
 
-    // --- Improved flags extraction ---
+    // Flexible flags parsing
     const lines = aiText.split(/\r?\n/);
     let currentSection = null;
 
@@ -83,14 +81,12 @@ function displayResults(aiText) {
         line = line.trim();
         if (!line) return;
 
-        // Section detection (more flexible)
         if (/red flag/i.test(line)) currentSection = 'red';
         else if (/yellow flag/i.test(line)) currentSection = 'yellow';
         else if (/neutral/i.test(line)) currentSection = null;
 
-        // List items detection (lines starting with dash or number)
         if (currentSection && /^[-\d.]/.test(line)) {
-            const cleanLine = line.replace(/^[-\d.\s]+/, ''); // remove dash or number
+            const cleanLine = line.replace(/^[-\d.\s]+/, '');
             if (currentSection === 'red') {
                 redFlagsList.innerHTML += `
                 <div class="p-4 border-l-4 border-red-500 bg-red-50 rounded-r">
