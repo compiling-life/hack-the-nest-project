@@ -16,42 +16,35 @@ clearBtn.addEventListener('click', clearInput);
 
 async function analyzeTerms() {
     const text = termsInput.value.trim();
-    if (!text) {
-        alert('Please paste some terms to analyze.');
-        return;
-    }
+    if (!text) { alert('Paste some terms.'); return; }
 
     analyzeBtn.innerHTML = '<i class="w-5 h-5 mr-2 animate-spin"></i> Analyzing...';
     feather.replace();
 
     try {
-        // Call your server
         const response = await fetch("/analyze", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ text })
         });
 
-        // The server already returns valid JSON
-        const analysis = await response.json();
+        const analysis = await response.json(); // <- THIS IS ALREADY JSON!
 
-        // Ensure all required fields exist
+        // Ensure required fields exist
         analysis.score = analysis.score ?? 50;
         analysis.redFlags = analysis.redFlags ?? [];
         analysis.neutralPoints = analysis.neutralPoints ?? [];
 
-        // Display the results
         displayResults(analysis);
 
     } catch (err) {
-        console.error("Error analyzing terms:", err);
+        console.error(err);
         alert("Error analyzing terms. Check console for details.");
     } finally {
         analyzeBtn.innerHTML = '<i class="w-5 h-5 mr-2"></i> Analyze Terms';
         feather.replace();
     }
 }
-
 
 function displayResults(analysis) {
     resultsSection.classList.remove('hidden');
